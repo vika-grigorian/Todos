@@ -18,4 +18,5 @@ protocol TodosListPresenterProtocol: AnyObject {
     func didSelectTodo(_ todo: Todos)
     func addNewTodo()
     func searchTodos(_ query: String)
+    func deleteTodo(_ todo: Todos)
 }

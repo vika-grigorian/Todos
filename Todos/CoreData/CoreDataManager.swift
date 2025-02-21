@@ -12,6 +12,11 @@ class CoreDataManager {
     static let shared = CoreDataManager()
     let persistentContainer: NSPersistentContainer
     
+    lazy var backgroundContext: NSManagedObjectContext = {
+        let context = persistentContainer.newBackgroundContext()
+        return context
+    }()
+    
     private init() {
         persistentContainer = NSPersistentContainer(name: "Todos")
         persistentContainer.loadPersistentStores { (storeDescription, error) in
