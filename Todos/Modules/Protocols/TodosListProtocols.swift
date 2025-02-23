@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 protocol TodosListViewProtocol: AnyObject {
     func showTodos(_ todos: [Todos])
     func showError(_ message: String)
+    var navigationController: UINavigationController? { get }
 }
 
 protocol TodosListPresenterProtocol: AnyObject {
@@ -19,4 +21,5 @@ protocol TodosListPresenterProtocol: AnyObject {
     func addNewTodo()
     func searchTodos(_ query: String)
     func deleteTodo(_ todo: Todos)
+    func navigateToDetail(for todo: Todos?)
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TodosListViewController: UIViewController, TodosListViewProtocol {
+class TodosListVC: UIViewController, TodosListViewProtocol {
     
     var presenter: TodosListPresenterProtocol?
     private var todos: [Todos] = []
@@ -16,11 +16,15 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
     private let searchController = UISearchController(searchResultsController: nil)
     private var countLabel: UILabel?
     
+//    override var navigationController: UINavigationController? {
+//        return self.navigationController 
+//    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("TodosListViewController: загружен")
         setupUI()
         presenter?.viewDidLoad()
-        print("TodosListViewController загружен")
     }
     
     func setupUI() {
@@ -91,7 +95,7 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
 
 // MARK: - UITableViewDataSource
 
-extension TodosListViewController: UITableViewDataSource {
+extension TodosListVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
@@ -112,7 +116,7 @@ extension TodosListViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
     
-    extension TodosListViewController: UITableViewDelegate {
+    extension TodosListVC: UITableViewDelegate {
         func tableView(_ tableView: UITableView,
                        didSelectRowAt indexPath: IndexPath) {
             let todo = todos[indexPath.row]
@@ -135,7 +139,7 @@ extension TodosListViewController: UITableViewDataSource {
     
     // MARK: - UISearchResultsUpdating
     
-    extension TodosListViewController: UISearchResultsUpdating {
+    extension TodosListVC: UISearchResultsUpdating {
         func updateSearchResults(for searchController: UISearchController) {
             let query = searchController.searchBar.text ?? ""
             presenter?.searchTodos(query)

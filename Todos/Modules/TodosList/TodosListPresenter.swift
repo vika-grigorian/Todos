@@ -1,17 +1,19 @@
 import Foundation
 import CoreData
+import UIKit
 
 class TodosListPresenter: TodosListPresenterProtocol {
-    
     weak var view: TodosListViewProtocol?
-    
     private let coreDataManager = CoreDataManager.shared
     private var allTodos: [Todos] = []
     private var filteredTodos: [Todos] = []
     
-    //MARK: - Lifecycle
+    private let backgroundQueue = DispatchQueue.global(qos: .userInitiated)
+    
     func viewDidLoad() {
         DispatchQueue.main.async {
+            print("Презентер: viewDidLoad начат")
+
             let localTodos = self.fetchLocalTodos()
             if localTodos.isEmpty {
                 self.fetchFromAPI()
@@ -32,22 +34,11 @@ class TodosListPresenter: TodosListPresenterProtocol {
     }
     
     func didSelectTodo(_ todo: Todos) {
-        //TODO: - add open todo, context menu
+        navigateToDetail(for: todo)
     }
     
     func addNewTodo() {
-        DispatchQueue.main.async {
-            let context = self.coreDataManager.context
-            let newTodo = Todos(context: context)
-            newTodo.id = Int64(Date().timeIntervalSince1970)
-            newTodo.todo = "New todo"
-            newTodo.completed = false
-            newTodo.userId = 1
-            newTodo.descriptionText = ""
-            
-            self.coreDataManager.saveContext()
-            self.refreshData()
-        }
+        navigateToDetail(for: nil)
     }
     
     func deleteTodo(_ todo: Todos) {
@@ -71,14 +62,34 @@ class TodosListPresenter: TodosListPresenterProtocol {
         }
     }
     
+    func navigateToDetail(for todo: Todos?) {
+//        DispatchQueue.main.async {
+//            let detailVC = TodoDetailVC(todo: todo)
+//            detailVC.delegate = self.view as? TodoDetailViewControllerDelegate
+//            self.view?.navigationController?.pushViewController(detailVC, animated: true)
+//        }
+        
+        DispatchQueue.main.async {
+                print("Презентер: переход на детальную страницу для задачи \(todo?.todo ?? "новая задача")")
+                let detailVC = TodoDetailVC(todo: todo)
+                detailVC.delegate = self.view as? TodoDetailViewControllerDelegate
+                if let navController = self.view?.navigationController {
+                    print("Презентер: навигационный контроллер найден, выполняем push")
+                    navController.pushViewController(detailVC, animated: true)
+                } else {
+                    print("Презентер: Ошибка — навигационный контроллер не найден")
+                }
+            }
+    }
+    
     private func fetchLocalTodos() -> [Todos] {
-        let context = coreDataManager.context // Основной контекст
+        let context = coreDataManager.context
         let fetchRequest = Todos.fetchRequest() as NSFetchRequest<Todos>
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
         do {
             return try context.fetch(fetchRequest)
         } catch {
-            print("Error fetching from CoreData: \(error)")
+            print("Ошибка при извлечении из Core Data: \(error)")
             return []
         }
     }
@@ -114,7 +125,7 @@ class TodosListPresenter: TodosListPresenterProtocol {
                     self.refreshData()
                 }
             } catch {
-                print("Error saving to CoreData: \(error)")
+                print("Ошибка при сохранении в Core Data: \(error)")
             }
         }
     }
