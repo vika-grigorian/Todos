@@ -17,12 +17,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         let todosVC = TodosListViewController()
+        let presenter = TodosListPresenter()
+
+        todosVC.presenter = presenter
+        presenter.view = todosVC  
+
         let navController = UINavigationController(rootViewController: todosVC)
         
         window.rootViewController = navController
         self.window = window
         window.makeKeyAndVisible()
     }
+
 
     func sceneDidDisconnect(_ scene: UIScene) {
     }

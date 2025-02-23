@@ -13,3 +13,7 @@ struct TodoResponse: Codable {
     let completed: Bool
     let userId: Int
 }
+
+struct TodosContainer: Decodable {
+    let todos: [TodoResponse]
+}

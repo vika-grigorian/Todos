@@ -11,12 +11,12 @@ class TodoCell: UITableViewCell {
     
     static let identifier = "TodoCell"
     
+    private var todoItem: Todos?
+    
     private let checkBox: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "circle"), for: .normal)
         button.setImage(UIImage(systemName: "checkmark.circle"), for: .selected)
-        button.tintColor = .gray
-        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -81,15 +81,41 @@ class TodoCell: UITableViewCell {
             dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4),
             dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
         ])
+        
+        checkBox.addTarget(self, action: #selector(didTapCheckBox), for: .touchUpInside)
     }
     
     func configure(with todo: Todos) {
+        self.todoItem = todo
         titleLabel.text = todo.todo
-        descriptionLabel.text = todo.description
+        descriptionLabel.text = (todo.descriptionText?.isEmpty ?? true) ? "Нет дополнительного текста" : todo.descriptionText
         dateLabel.text = formatDate(todo.date)
         
         checkBox.isSelected = todo.completed
-        checkBox.tintColor = todo.completed ? .systemGreen : .gray
+        checkBox.tintColor = todo.completed ? .systemYellow : .systemGray
+        
+        if todo.completed {
+            titleLabel.textColor = .darkGray
+            titleLabel.attributedText = NSAttributedString(string: todo.todo ?? "",
+                                                           attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            descriptionLabel.textColor = .gray
+        } else {
+            titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            titleLabel.attributedText = NSAttributedString(string: todo.todo ?? "",
+                                                           attributes: [.strikethroughStyle: []])
+            descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+        }
+        
+        dateLabel.textColor = .gray
+    }
+    
+    @objc private func didTapCheckBox() {
+        checkBox.isSelected.toggle()
+        
+        if let todo = todoItem {
+            todo.completed = checkBox.isSelected
+            configure(with: todo)
+        }
     }
     
     private func formatDate(_ date: Date?) -> String {
@@ -100,4 +126,3 @@ class TodoCell: UITableViewCell {
         return formatter.string(from: date)
     }
 }
-

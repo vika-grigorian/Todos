@@ -10,17 +10,23 @@ import UIKit
 class TodosListViewController: UIViewController, TodosListViewProtocol {
     
     var presenter: TodosListPresenterProtocol?
-    
     private var todos: [Todos] = []
-    private let tableView = UITableView()
+    
+    private let tableView: UITableView = {
+        let table = UITableView()
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.register(TodoCell.self, forCellReuseIdentifier: "TodoCell")
+        return table
+    }()
+    
     private let searchController = UISearchController(searchResultsController: nil)
+    private var countLabel: UILabel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        self.presenter?.viewDidLoad()
+        presenter?.viewDidLoad()
         print("TodosListViewController загружен")
-
     }
     
     func setupUI() {
@@ -28,22 +34,53 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
         view.backgroundColor = .systemBackground
         
         // table
-        tableView.frame = view.bounds
         view.addSubview(tableView)
-        tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(TodoCell.self, forCellReuseIdentifier: TodoCell.identifier)
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 80
+        tableView.dataSource = self
         
         //add button
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTodo))
+        let toolbar = UIToolbar()
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(toolbar)
+        
+        
+        let countLabel = UILabel()
+        countLabel.text = "0 задач"
+        countLabel.textAlignment = .center
+        countLabel.textColor = .label
+        countLabel.font = UIFont.systemFont(ofSize: 16)
+        countLabel.sizeToFit()
+        self.countLabel = countLabel
+        let countItem = UIBarButtonItem(customView: countLabel)
+        
+        let addButton = UIBarButtonItem(
+            image: UIImage(systemName: "square.and.pencil"),
+            style: .plain,
+            target: self,
+            action: #selector(addTodo)
+        )
+        addButton.tintColor = .yellow
+        
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([countItem, flexibleSpace, addButton], animated: false)
         
         //search
         searchController.searchResultsUpdater = self
         navigationItem.searchController = searchController
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Поиск"
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
+            
+            toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            toolbar.heightAnchor.constraint(equalToConstant: 50),
+        ])
     }
     
     @objc private func addTodo() {
@@ -58,16 +95,10 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
         
         self.todos = todos
         
-        tableView.performBatchUpdates({
-            for change in changes {
-                switch change {
-                case .remove(let offset, _, _):
-                    tableView.deleteRows(at: [IndexPath(row: offset, section: 0)], with: .fade)
-                case .insert(let offset, _, _):
-                    tableView.insertRows(at: [IndexPath(row: offset, section: 0)], with: .fade)
-                }
-            }
-        })
+        DispatchQueue.main.async {
+            self.countLabel?.text = "\(todos.count) задач"
+            self.tableView.reloadData()
+        }
     }
     
     func showError(_ message: String) {
@@ -98,32 +129,35 @@ extension TodosListViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - UITableViewDelegate
 
-extension TodosListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView,
-                   didSelectRowAt indexPath: IndexPath) {
-        let todo = todos[indexPath.row]
-        presenter?.didSelectTodo(todo)
-    }
+// MARK: - UITableViewDelegate
     
-    // Удаление задачи
-    func tableView(_ tableView: UITableView,
-                   commit editingStyle: UITableViewCell.EditingStyle,
-                   forRowAt indexPath: IndexPath
-    ) {
-        if editingStyle == .delete {
+    extension TodosListViewController: UITableViewDelegate {
+        func tableView(_ tableView: UITableView,
+                       didSelectRowAt indexPath: IndexPath) {
             let todo = todos[indexPath.row]
-            presenter?.deleteTodo(todo)
+            presenter?.didSelectTodo(todo)
+            tableView.deselectRow(at: indexPath, animated: true)
+            
+        }
+        
+        // Удаление задачи
+        func tableView(_ tableView: UITableView,
+                       commit editingStyle: UITableViewCell.EditingStyle,
+                       forRowAt indexPath: IndexPath
+        ) {
+            if editingStyle == .delete {
+                let todo = todos[indexPath.row]
+                presenter?.deleteTodo(todo)
+            }
         }
     }
-}
-
-// MARK: - UISearchResultsUpdating
-
-extension TodosListViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let query = searchController.searchBar.text ?? ""
-        presenter?.searchTodos(query)
+    
+    // MARK: - UISearchResultsUpdating
+    
+    extension TodosListViewController: UISearchResultsUpdating {
+        func updateSearchResults(for searchController: UISearchController) {
+            let query = searchController.searchBar.text ?? ""
+            presenter?.searchTodos(query)
+        }
     }
-}
