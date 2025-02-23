@@ -11,14 +11,8 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
     
     var presenter: TodosListPresenterProtocol?
     private var todos: [Todos] = []
-    
-    private let tableView: UITableView = {
-        let table = UITableView()
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.register(TodoCell.self, forCellReuseIdentifier: "TodoCell")
-        return table
-    }()
-    
+    private let tableView = TodosTableView()
+    private let toolbar = TodosToolbar()
     private let searchController = UISearchController(searchResultsController: nil)
     private var countLabel: UILabel?
     
@@ -35,34 +29,12 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
         
         // table
         view.addSubview(tableView)
-        tableView.delegate = self
         tableView.dataSource = self
+        tableView.delegate = self
         
-        //add button
-        let toolbar = UIToolbar()
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        // toolbar
         view.addSubview(toolbar)
-        
-        
-        let countLabel = UILabel()
-        countLabel.text = "0 задач"
-        countLabel.textAlignment = .center
-        countLabel.textColor = .label
-        countLabel.font = UIFont.systemFont(ofSize: 16)
-        countLabel.sizeToFit()
-        self.countLabel = countLabel
-        let countItem = UIBarButtonItem(customView: countLabel)
-        
-        let addButton = UIBarButtonItem(
-            image: UIImage(systemName: "square.and.pencil"),
-            style: .plain,
-            target: self,
-            action: #selector(addTodo)
-        )
-        addButton.tintColor = .yellow
-        
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.setItems([countItem, flexibleSpace, addButton], animated: false)
+        toolbar.setAddTarget(self, action: #selector(addTodo))
         
         //search
         searchController.searchResultsUpdater = self
@@ -90,16 +62,24 @@ class TodosListViewController: UIViewController, TodosListViewProtocol {
     // MARK: - TodosListViewProtocol
     
     func showTodos(_ todos: [Todos]) {
-        let oldTodos = self.todos
-        let changes = oldTodos.difference(from: todos) { $0.id == $1.id }
-        
         self.todos = todos
-        
         DispatchQueue.main.async {
-            self.countLabel?.text = "\(todos.count) задач"
+            self.toolbar.updateCount(todos.count)
             self.tableView.reloadData()
         }
     }
+    
+//    func showTodos(_ todos: [Todos]) {
+//        let oldTodos = self.todos
+//        let changes = oldTodos.difference(from: todos) { $0.id == $1.id }
+//        
+//        self.todos = todos
+//        
+//        DispatchQueue.main.async {
+//            self.countLabel?.text = "\(todos.count) задач"
+//            self.tableView.reloadData()
+//        }
+//    }
     
     func showError(_ message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
