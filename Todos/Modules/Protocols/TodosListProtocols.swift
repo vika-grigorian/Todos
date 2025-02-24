@@ -19,7 +19,8 @@ protocol TodosListPresenterProtocol: AnyObject {
     func refreshData()
     func didSelectTodo(_ todo: Todos)
     func addNewTodo()
-    func searchTodos(_ query: String)
+    func shareTodo(_ todo: Todos)
     func deleteTodo(_ todo: Todos)
+    func searchTodos(_ query: String)
     func navigateToDetail(for todo: Todos?)
 }

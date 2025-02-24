@@ -16,17 +16,13 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
     private let searchController = UISearchController(searchResultsController: nil)
     private var countLabel: UILabel?
     
-//    override var navigationController: UINavigationController? {
-//        return self.navigationController 
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("TodosListViewController: загружен")
         setupUI()
         presenter?.viewDidLoad()
     }
-    
+
     func setupUI() {
         title = "Задачи"
         view.backgroundColor = .systemBackground
@@ -73,17 +69,17 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
         }
     }
     
-//    func showTodos(_ todos: [Todos]) {
-//        let oldTodos = self.todos
-//        let changes = oldTodos.difference(from: todos) { $0.id == $1.id }
-//        
-//        self.todos = todos
-//        
-//        DispatchQueue.main.async {
-//            self.countLabel?.text = "\(todos.count) задач"
-//            self.tableView.reloadData()
-//        }
-//    }
+    //    func showTodos(_ todos: [Todos]) {
+    //        let oldTodos = self.todos
+    //        let changes = oldTodos.difference(from: todos) { $0.id == $1.id }
+    //
+    //        self.todos = todos
+    //
+    //        DispatchQueue.main.async {
+    //            self.countLabel?.text = "\(todos.count) задач"
+    //            self.tableView.reloadData()
+    //        }
+    //    }
     
     func showError(_ message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
@@ -115,33 +111,55 @@ extension TodosListVC: UITableViewDataSource {
 
 
 // MARK: - UITableViewDelegate
+extension TodosListVC: UITableViewDelegate {
     
-    extension TodosListVC: UITableViewDelegate {
-        func tableView(_ tableView: UITableView,
-                       didSelectRowAt indexPath: IndexPath) {
-            let todo = todos[indexPath.row]
-            presenter?.didSelectTodo(todo)
-            tableView.deselectRow(at: indexPath, animated: true)
-            
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let todo = todos[indexPath.row]
+        presenter?.didSelectTodo(todo)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    // Контекстное меню
+    func tableView(_ tableView: UITableView, contextMenuForRowAt indexPath: IndexPath) -> UIContextMenuConfiguration? {
+        let todo = todos[indexPath.row]
+        print("Запрошено контекстное меню для строки \(indexPath.row)")
+        
+        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+            self.presenter?.didSelectTodo(todo)
         }
         
-        // Удаление задачи
-        func tableView(_ tableView: UITableView,
-                       commit editingStyle: UITableViewCell.EditingStyle,
-                       forRowAt indexPath: IndexPath
-        ) {
-            if editingStyle == .delete {
-                let todo = todos[indexPath.row]
-                presenter?.deleteTodo(todo)
-            }
+        let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+            self.presenter?.shareTodo(todo)
+        }
+        
+        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+            self.presenter?.deleteTodo(todo)
+        }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            UIMenu(title: "", children: [editAction, shareAction, deleteAction])
         }
     }
+
     
-    // MARK: - UISearchResultsUpdating
-    
-    extension TodosListVC: UISearchResultsUpdating {
-        func updateSearchResults(for searchController: UISearchController) {
-            let query = searchController.searchBar.text ?? ""
-            presenter?.searchTodos(query)
+    // Удаление задачи
+    func tableView(_ tableView: UITableView,
+                   commit editingStyle: UITableViewCell.EditingStyle,
+                   forRowAt indexPath: IndexPath
+    ) {
+        if editingStyle == .delete {
+            let todo = todos[indexPath.row]
+            presenter?.deleteTodo(todo)
         }
     }
+}
+
+
+// MARK: - UISearchResultsUpdating
+
+extension TodosListVC: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let query = searchController.searchBar.text ?? ""
+        presenter?.searchTodos(query)
+    }
+}
