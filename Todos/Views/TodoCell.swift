@@ -122,7 +122,7 @@ class TodoCell: UITableViewCell {
         guard let date = date else { return "Нет даты" }
         let formatter = DateFormatter()
         formatter.dateStyle = .short
-        formatter.timeStyle = .medium
+        formatter.timeStyle = .short
         return formatter.string(from: date)
     }
 }

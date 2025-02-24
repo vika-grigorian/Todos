@@ -21,20 +21,23 @@ class TodoDetailVC: UIViewController {
     private let coreDataManager = CoreDataManager.shared
     
     // UI элементы
-    private let titleTextField: UITextField = {
-        let textField = UITextField()
-        textField.font = .boldSystemFont(ofSize: 34)
-        textField.placeholder = "Название задачи"
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        return textField
+    private let titleTextView: UITextView = {
+        let textView = UITextView()
+        textView.font = .boldSystemFont(ofSize: 34)
+        textView.textContainerInset = .zero
+        textView.textContainer.lineFragmentPadding = 0
+        textView.isScrollEnabled = false
+        textView.returnKeyType = .next
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        return textView
     }()
     
     private let descriptionTextView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 16, weight: .regular)
-        textView.layer.borderColor = UIColor.lightGray.cgColor
-        textView.layer.borderWidth = 1.0
-        textView.layer.cornerRadius = 8.0
+        textView.isEditable = true
+        textView.isUserInteractionEnabled = true
+        textView.returnKeyType = .default
         textView.translatesAutoresizingMaskIntoConstraints = false
         return textView
     }()
@@ -55,70 +58,75 @@ class TodoDetailVC: UIViewController {
         setupUI()
         configureNavigation()
         loadTodoData()
+        titleTextView.delegate = self
     }
     
     // MARK: - Настройка UI
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        view.addSubview(titleTextField)
+        view.addSubview(titleTextView)
         view.addSubview(descriptionTextView)
         
         NSLayoutConstraint.activate([
-            titleTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            titleTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            titleTextView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            descriptionTextView.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
+            descriptionTextView.topAnchor.constraint(equalTo: titleTextView.bottomAnchor, constant: 20),
             descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            descriptionTextView.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            descriptionTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
     
     private func configureNavigation() {
         title = todo == nil ? "Новая задача" : "Редактировать задачу"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "< Назад", style: .plain, target: self, action: #selector(backButtonTapped))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Сохранить", style: .done, target: self, action: #selector(saveButtonTapped))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"),
+                                                           style: .plain,
+                                                           target: self,
+                                                           action: #selector(backButtonTapped))
     }
     
     // MARK: - Загрузка данных
     private func loadTodoData() {
         guard let todo = todo else {
-            titleTextField.becomeFirstResponder() // Курсор на поле заголовка для новой задачи
+            titleTextView.becomeFirstResponder()
             return
         }
-        titleTextField.text = todo.todo
+        titleTextView.text = todo.todo
         descriptionTextView.text = todo.descriptionText
     }
     
     // MARK: - Действия
     @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func saveButtonTapped() {
-        guard let title = titleTextField.text, !title.isEmpty else {
-            showError("Название задачи не может быть пустым")
-            return
-        }
+        let titleText = titleTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let descriptionText = descriptionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
         
         let context = coreDataManager.context
+
         if let existingTodo = todo {
-            // Редактирование существующей задачи
-            existingTodo.todo = title
-            existingTodo.descriptionText = descriptionTextView.text
-            existingTodo.date = Date()
+            if titleText.isEmpty && descriptionText.isEmpty {
+                context.delete(existingTodo)
+            } else {
+                       existingTodo.todo = titleText
+                       existingTodo.descriptionText = descriptionText
+                       existingTodo.date = Date()
+                   }
         } else {
-            // Создание новой задачи
-            let newTodo = Todos(context: context)
-            newTodo.id = Int64(Date().timeIntervalSince1970)
-            newTodo.todo = title
-            newTodo.descriptionText = descriptionTextView.text
-            newTodo.completed = false
-            newTodo.userId = 1
-            newTodo.date = Date()
-        }
+                if titleText.isEmpty && descriptionText.isEmpty {
+                    navigationController?.popViewController(animated: true)
+                    return
+                } else {
+                    let newTodo = Todos(context: context)
+                    newTodo.id = Int64(Date().timeIntervalSince1970)
+                    newTodo.todo = titleText
+                    newTodo.descriptionText = descriptionText
+                    newTodo.completed = false
+                    newTodo.userId = 1
+                    newTodo.date = Date()
+                }
+            }
         
         do {
             try context.save()
@@ -133,5 +141,24 @@ class TodoDetailVC: UIViewController {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+}
+
+// MARK: - UITextViewDelegate
+extension TodoDetailVC: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if textView == titleTextView && text == "\n" {
+            print("Return нажато в заголовке")
+            
+            descriptionTextView.becomeFirstResponder()
+            return false
+        }
+        return true
+    }
+}
+
+extension TodosListVC: TodoDetailViewControllerDelegate {
+    func didSaveTodo() {
+        presenter?.refreshData()
     }
 }
