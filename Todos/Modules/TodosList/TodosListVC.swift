@@ -15,6 +15,7 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
     private let toolbar = TodosToolbar()
     private let searchController = UISearchController(searchResultsController: nil)
     private var countLabel: UILabel?
+    private var selectedIndexPath: IndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +23,7 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
         setupUI()
         presenter?.viewDidLoad()
     }
-
+    
     func setupUI() {
         title = "Задачи"
         view.backgroundColor = .systemBackground
@@ -69,18 +70,6 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
         }
     }
     
-    //    func showTodos(_ todos: [Todos]) {
-    //        let oldTodos = self.todos
-    //        let changes = oldTodos.difference(from: todos) { $0.id == $1.id }
-    //
-    //        self.todos = todos
-    //
-    //        DispatchQueue.main.async {
-    //            self.countLabel?.text = "\(todos.count) задач"
-    //            self.tableView.reloadData()
-    //        }
-    //    }
-    
     func showError(_ message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -119,29 +108,6 @@ extension TodosListVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    // Контекстное меню
-    func tableView(_ tableView: UITableView, contextMenuForRowAt indexPath: IndexPath) -> UIContextMenuConfiguration? {
-        let todo = todos[indexPath.row]
-        print("Запрошено контекстное меню для строки \(indexPath.row)")
-        
-        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-            self.presenter?.didSelectTodo(todo)
-        }
-        
-        let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            self.presenter?.shareTodo(todo)
-        }
-        
-        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-            self.presenter?.deleteTodo(todo)
-        }
-        
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            UIMenu(title: "", children: [editAction, shareAction, deleteAction])
-        }
-    }
-
-    
     // Удаление задачи
     func tableView(_ tableView: UITableView,
                    commit editingStyle: UITableViewCell.EditingStyle,
@@ -152,8 +118,33 @@ extension TodosListVC: UITableViewDelegate {
             presenter?.deleteTodo(todo)
         }
     }
-}
+    
+    // Контекстное меню
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
 
+        let todo = todos[indexPath.row]
+        
+        let editAction = UIAction(title: "Редактировать",
+                                  image: UIImage(named: "edit")) { _ in
+            self.presenter?.didSelectTodo(todo)
+        }
+        
+        let shareAction = UIAction(title: "Поделиться",
+                                   image: UIImage(named: "export")) { _ in
+            self.presenter?.shareTodo(todo)
+        }
+        
+        let deleteAction = UIAction(title: "Удалить",
+                                    image: UIImage(named: "trash"),
+                                    attributes: .destructive) { _ in
+            self.presenter?.deleteTodo(todo)
+        }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+        }
+    }
+}
 
 // MARK: - UISearchResultsUpdating
 
@@ -161,5 +152,12 @@ extension TodosListVC: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         let query = searchController.searchBar.text ?? ""
         presenter?.searchTodos(query)
+    }
+}
+
+// MARK: - TodoDetailViewControllerDelegate / refresh after saving changes
+extension TodosListVC: TodoDetailViewControllerDelegate {
+    func didSaveTodo() {
+        presenter?.refreshData()
     }
 }

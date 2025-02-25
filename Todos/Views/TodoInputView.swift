@@ -17,6 +17,7 @@ class TodoInputView: UIView {
         textView.textContainer.lineFragmentPadding = 0
         textView.isScrollEnabled = false
         textView.returnKeyType = .next
+        textView.tintColor = .systemYellow
         textView.translatesAutoresizingMaskIntoConstraints = false
         return textView
     }()
@@ -27,6 +28,7 @@ class TodoInputView: UIView {
         textView.isEditable = true
         textView.isUserInteractionEnabled = true
         textView.returnKeyType = .default
+        textView.tintColor = .systemYellow 
         textView.translatesAutoresizingMaskIntoConstraints = false
         return textView
     }()

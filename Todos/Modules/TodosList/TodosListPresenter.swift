@@ -1,4 +1,3 @@
-import Foundation
 import CoreData
 import UIKit
 
@@ -76,23 +75,11 @@ class TodosListPresenter: TodosListPresenterProtocol {
     }
     
     func navigateToDetail(for todo: Todos?) {
-        //        DispatchQueue.main.async {
-        //            let detailVC = TodoDetailVC(todo: todo)
-        //            detailVC.delegate = self.view as? TodoDetailViewControllerDelegate
-        //            self.view?.navigationController?.pushViewController(detailVC, animated: true)
-        //        }
-        
-        DispatchQueue.main.async {
-            print("Презентер: переход на детальную страницу для задачи \(todo?.todo ?? "новая задача")")
-            let detailVC = TodoDetailVC(todo: todo)
-            detailVC.delegate = self.view as? TodoDetailViewControllerDelegate
-            if let navController = self.view?.navigationController {
-                print("Презентер: навигационный контроллер найден, выполняем push")
-                navController.pushViewController(detailVC, animated: true)
-            } else {
-                print("Презентер: Ошибка — навигационный контроллер не найден")
-            }
-        }
+                DispatchQueue.main.async {
+                    let detailVC = TodoDetailVC(todo: todo)
+                    detailVC.delegate = self.view as? TodoDetailViewControllerDelegate
+                    self.view?.navigationController?.pushViewController(detailVC, animated: true)
+                }
     }
     
     private func fetchLocalTodos() -> [Todos] {
