@@ -31,6 +31,8 @@ class TodoDetailVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
+
         setupUI()
         configureNavigation()
         loadTodoData()
@@ -39,6 +41,7 @@ class TodoDetailVC: UIViewController {
     
     // MARK: - Настройка UI
     private func setupUI() {
+        
         view.backgroundColor = .systemBackground
         
         view.addSubview(todoInputView)

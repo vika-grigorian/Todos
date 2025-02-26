@@ -19,16 +19,26 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("TodosListViewController: загружен")
+
         setupUI()
         presenter?.viewDidLoad()
     }
     
     func setupUI() {
-        title = "Задачи"
         view.backgroundColor = .systemBackground
+
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
         
-        //title
+        navigationItem.title = "Задачи"
+        
+        //search
+        searchController.searchResultsUpdater = self
+        navigationItem.searchController = searchController
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+
+        searchController.searchBar.placeholder = "Поиск"
         
         // table
         view.addSubview(tableView)
@@ -39,13 +49,9 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
         view.addSubview(toolbar)
         toolbar.setAddTarget(self, action: #selector(addTodo))
         
-        //search
-        searchController.searchResultsUpdater = self
-        navigationItem.searchController = searchController
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Поиск"
-        
         NSLayoutConstraint.activate([
+
+            
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -56,6 +62,7 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
             toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             toolbar.heightAnchor.constraint(equalToConstant: 50),
         ])
+        
     }
     
     @objc private func addTodo() {
