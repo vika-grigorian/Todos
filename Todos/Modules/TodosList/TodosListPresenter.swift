@@ -97,7 +97,7 @@ class TodosListPresenter: TodosListPresenterProtocol {
     private func fetchLocalTodos() -> [Todos] {
         let context = coreDataManager.context
         let fetchRequest = Todos.fetchRequest() as NSFetchRequest<Todos>
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         do {
             return try context.fetch(fetchRequest)
         } catch {
