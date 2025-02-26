@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		047A824C2D6F3C9300E46303 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 047A811B2D68675E00E46303 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 047A81222D68675E00E46303;
+			remoteInfo = Todos;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		047A81232D68675E00E46303 /* Todos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todos.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		047A82482D6F3C9300E46303 /* TodosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TodosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -29,10 +40,22 @@
 			path = Todos;
 			sourceTree = "<group>";
 		};
+		047A82492D6F3C9300E46303 /* TodosTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TodosTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		047A81202D68675E00E46303 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		047A82452D6F3C9300E46303 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				047A81252D68675E00E46303 /* Todos */,
+				047A82492D6F3C9300E46303 /* TodosTests */,
 				047A81242D68675E00E46303 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				047A81232D68675E00E46303 /* Todos.app */,
+				047A82482D6F3C9300E46303 /* TodosTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,6 +108,29 @@
 			productReference = 047A81232D68675E00E46303 /* Todos.app */;
 			productType = "com.apple.product-type.application";
 		};
+		047A82472D6F3C9300E46303 /* TodosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 047A82502D6F3C9300E46303 /* Build configuration list for PBXNativeTarget "TodosTests" */;
+			buildPhases = (
+				047A82442D6F3C9300E46303 /* Sources */,
+				047A82452D6F3C9300E46303 /* Frameworks */,
+				047A82462D6F3C9300E46303 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				047A824D2D6F3C9300E46303 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				047A82492D6F3C9300E46303 /* TodosTests */,
+			);
+			name = TodosTests;
+			packageProductDependencies = (
+			);
+			productName = TodosTests;
+			productReference = 047A82482D6F3C9300E46303 /* TodosTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -95,6 +143,10 @@
 				TargetAttributes = {
 					047A81222D68675E00E46303 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					047A82472D6F3C9300E46303 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 047A81222D68675E00E46303;
 					};
 				};
 			};
@@ -113,12 +165,20 @@
 			projectRoot = "";
 			targets = (
 				047A81222D68675E00E46303 /* Todos */,
+				047A82472D6F3C9300E46303 /* TodosTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		047A81212D68675E00E46303 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		047A82462D6F3C9300E46303 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +195,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		047A82442D6F3C9300E46303 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		047A824D2D6F3C9300E46303 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 047A81222D68675E00E46303 /* Todos */;
+			targetProxy = 047A824C2D6F3C9300E46303 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		047A81372D68676000E46303 /* Debug */ = {
@@ -321,6 +396,42 @@
 			};
 			name = Release;
 		};
+		047A824E2D6F3C9300E46303 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98MDKX388P;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vg.TodosTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Todos.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Todos";
+			};
+			name = Debug;
+		};
+		047A824F2D6F3C9300E46303 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98MDKX388P;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vg.TodosTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Todos.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Todos";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -338,6 +449,15 @@
 			buildConfigurations = (
 				047A81372D68676000E46303 /* Debug */,
 				047A81382D68676000E46303 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		047A82502D6F3C9300E46303 /* Build configuration list for PBXNativeTarget "TodosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				047A824E2D6F3C9300E46303 /* Debug */,
+				047A824F2D6F3C9300E46303 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

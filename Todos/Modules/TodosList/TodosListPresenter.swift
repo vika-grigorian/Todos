@@ -1,18 +1,30 @@
+//
+//  TodosListPresenter.swift
+//  Todos
+//
+//  Created by Vika on 21.02.25.
+//
+
 import CoreData
 import UIKit
 
 class TodosListPresenter: TodosListPresenterProtocol {
     
     weak var view: TodosListViewProtocol?
-    private let coreDataManager = CoreDataManager.shared
-    private var allTodos: [Todos] = []
+    private let coreDataManager: CoreDataManagerProtocol
+    internal var allTodos: [Todos] = []
     private var filteredTodos: [Todos] = []
+    private let networkManager: NetworkManagerProtocol
     
     private let backgroundQueue = DispatchQueue.global(qos: .userInitiated)
     
+    init(networkManager: NetworkManagerProtocol = NetworkManager.shared, coreDataManager: CoreDataManagerProtocol = CoreDataManager.shared) {
+            self.networkManager = networkManager
+            self.coreDataManager = coreDataManager
+        }
+    
     func viewDidLoad() {
         DispatchQueue.main.async {
-            print("Презентер: viewDidLoad начат")
             
             let localTodos = self.fetchLocalTodos()
             if localTodos.isEmpty {
@@ -95,7 +107,7 @@ class TodosListPresenter: TodosListPresenterProtocol {
     }
     
     private func fetchFromAPI() {
-        NetworkManager.shared.fetchTodos { [weak self] result in
+        self.networkManager.fetchTodos { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let todosFromAPI):

@@ -12,12 +12,13 @@ import CoreData
 class TodoDetailPresenter: TodoDetailPresenterProtocol {
     
     weak var view: TodoDetailViewProtocol?
-    private let coreDataManager = CoreDataManager.shared
+    private let coreDataManager: CoreDataManagerProtocol
     private var todo: Todos?
     
-    init(view: TodoDetailViewProtocol, todo: Todos?) {
-        self.view = view
-        self.todo = todo
+    init(view: TodoDetailViewProtocol, todo: Todos?, coreDataManager: CoreDataManagerProtocol = CoreDataManager.shared) {
+            self.view = view
+            self.todo = todo
+            self.coreDataManager = coreDataManager
     }
     
     func saveTodo(title: String, description: String) {

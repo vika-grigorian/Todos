@@ -1,5 +1,5 @@
 //
-//  TodosListViewController.swift
+//  TodosListVC.swift
 //  Todos
 //
 //  Created by Vika on 21.02.25.
@@ -12,8 +12,8 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
     var presenter: TodosListPresenterProtocol?
     private var todos: [Todos] = []
     private let tableView = TodosTableView()
-    private let toolbar = TodosToolbar()
     private let searchController = UISearchController(searchResultsController: nil)
+    private let toolbar = TodosToolbar()
     private var countLabel: UILabel?
     private var selectedIndexPath: IndexPath?
     
@@ -27,6 +27,8 @@ class TodosListVC: UIViewController, TodosListViewProtocol {
     func setupUI() {
         title = "Задачи"
         view.backgroundColor = .systemBackground
+        
+        //title
         
         // table
         view.addSubview(tableView)
@@ -121,7 +123,7 @@ extension TodosListVC: UITableViewDelegate {
     
     // Контекстное меню
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-
+        
         let todo = todos[indexPath.row]
         
         let editAction = UIAction(title: "Редактировать",
